@@ -13,8 +13,10 @@ use vbpupil\InputValidation;
 
 include 'vendor/autoload.php';
 
-$check = array('name','telephone','postcode','mobile', 'amount');
+$check = array('telephone','postcode','mobile');
 
 if(isset($_POST)) {
-    InputValidation::validate($_POST, $check);
+    $r = InputValidation::validate($_POST, $check);
+
+    dump($r);
 }
