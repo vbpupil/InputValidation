@@ -1,4 +1,6 @@
 {
+  "name": "vbpupil/input-validation",
+  "description": "Very simple Form Input Validation for when you want to use your own existing forms.",
   "autoload" : {
     "psr-4" : {
       "vbpupil\\" : "src"
