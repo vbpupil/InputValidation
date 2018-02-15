@@ -1,9 +1,8 @@
 <form method="POST">
     <input type="text" name="name" value="dean" placeholder="NAME"><br>
-    <input type="text" name="telephone" value="+441604444555" placeholder="TELEPHONE"><br>
-    <input type="text" name="postcode" value="nn57j y" placeholder="POSTCODE"><br>
+    <input type="text" name="telephone" value="+44204444555" placeholder="TELEPHONE"><br>
+    <input type="text" name="postcode" value="CT16 1AA" placeholder="POSTCODE"><br>
     <input type="text" name="mobile" value="07908765432" placeholder="MOBILE"><br>
-    <input type="text" name="amount" value="1.00" placeholder="Amount"><br>
     <input type="submit" name="submit">
 </form>
 

@@ -12,7 +12,6 @@ namespace vbpupil;
 
 /**
  * Class InputValidation
- * @package vbpupil
  */
 class InputValidation
 {
@@ -31,20 +30,10 @@ class InputValidation
     );
 
     /**
-     * @var array
-     */
-    public static $definitions = array(
-        'email' => array('contact_email', 'sales_email'),
-        'uk_telephone' => array('phone', 'tel', 'telephone'),
-        'uk_mobile' => array('mobile', 'mob'),
-        'postcode' => array('postcode', 'post-code', 'post_code'),
-        'amount' => array('amount')
-    );
-
-    /**
      * @param $data
      * @param $check
      * @return array
+     * @throws \Exception
      */
     public static function validate($data, $check)
     {
@@ -57,7 +46,22 @@ class InputValidation
             return $results;
         }
 
+        //READ IN ERRO AND SUCCESS TEXT START
+        try {
+            $errorTxt = self::getErrorText();
+        } catch (\Exception $e) {
+            die(get_class() . ': ' . $e->getMessage());
+        }
+
+        try {
+            $successTxt = self::getErrorText('success');
+        } catch (\Exception $e) {
+            die(get_class() . ': ' . $e->getMessage());
+        }
+        //READ IN ERRO AND SUCCESS TEXT END
+
         foreach ($data as $k => $v) {
+            $tmpETxt = $errorTxt;
             //check that this input item is in the supplied array
             if (in_array($k, $check)) {
                 //lets identify what this input type is
@@ -89,11 +93,12 @@ class InputValidation
 
                     //oh no! we failed validation
                     if ($r == false) {
-                        $results['error'][] = "[{$k}|{$v}] identified as [{$type}] IS INVALID";
+                        $results['error'][] = str_replace(array('[NAME]', '[TYPE]','[VALUE]'), array($k,$type,$v), $tmpETxt);
                     }
                 }
             }
         }
+
 
         return $results;
     }
@@ -116,10 +121,11 @@ class InputValidation
      *
      * @param $data
      * @return int|string
+     * @throws \Exception
      */
     public static function identify($data)
     {
-        foreach (self::$definitions as $k => $v) {
+        foreach (self::getDefinitions() as $k => $v) {
             foreach ($v as $type) {
                 if (strpos($type, $data) !== false) {
                     return $k;
@@ -128,5 +134,45 @@ class InputValidation
         }
 
         return false;
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public static function getDefinitions()
+    {
+        $defs = [];
+
+        foreach (file(dirname(__DIR__) . '/src/config/definitions.txt') as $def) {
+            if (!empty($def)) {
+                $tmp = explode('|', str_replace("\n", '', $def));
+                if (count($tmp) > 2) {
+                    throw new \Exception('Invalid definitions file');
+                }
+
+                if ($tmp[0] == '' || $tmp[1] == '') {
+                    throw new \Exception('Invalid definitions file');
+
+                }
+
+                $defs[$tmp[1]][] = $tmp[0];
+            }
+        }
+
+        return $defs;
+    }
+
+    public static function getErrorText($type ='error')
+    {
+        if ($eTxt = file(dirname(__DIR__) . "/src/config/{$type}.txt")) {
+            foreach ($eTxt AS $err) {
+                if (!preg_match('~(^#|^\s)~', $err)) {
+                    return $err;
+                }
+            }
+        }
+
+        throw new \Exception("{$type} config file not present");
     }
 }
