@@ -10,3 +10,4 @@ postcode|postcode
 postcode|postcode
 post-code|postcode
 post_code|postcode
+textarea|text

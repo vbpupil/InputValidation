@@ -2,9 +2,4 @@
 #[NAME] = name of the input
 #[TYPE] = identified type of input
 #[VALUE] = value of the input
-
-
-
-
-
 [NAME] is NOT valid

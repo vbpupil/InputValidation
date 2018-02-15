@@ -18,16 +18,14 @@ class InputValidation
     /**
      * @var array
      */
-    public static $regex = Array(
+    public static $regex = [
         'email' => "/[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+.[a-zA-Z]{2,4}/",
-        'postcode' => "~^(GIR 0AA)|(TDCU 1ZZ)|(ASCN 1ZZ)|(BIQQ 1ZZ)|(BBND 1ZZ)"
-            . "|(FIQQ 1ZZ)|(PCRN 1ZZ)|(STHL 1ZZ)|(SIQQ 1ZZ)|(TKCA 1ZZ)"
-            . "|[A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]"
-            . "|[A-HK-Y][0-9]([0-9]|[ABEHMNPRV-Y]))"
-            . "|[0-9][A-HJKS-UW])\\s?[0-9][ABD-HJLNP-UW-Z]{2}$~i",
+        'postcode' => '~^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z]))))[0-9][A-Za-z]{2})$~',
         'uk_telephone' => '~^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$~',
-        'uk_mobile' => "/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/"
-    );
+        'uk_mobile' => "/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/",
+        'number' => "~^[0-9]+$~",
+        'text' => "~^[a-z0-9\s]+$~i"
+    ];
 
     /**
      * @param $data
@@ -38,7 +36,7 @@ class InputValidation
     public static function validate($data, $check)
     {
         //contains results to be returned back to the client
-        $results = array();
+        $results = [];
 
         if (empty($check)) {
             //we don't have any check inputs set, error and leave.
@@ -62,6 +60,8 @@ class InputValidation
 
         foreach ($data as $k => $v) {
             $tmpETxt = $errorTxt;
+            $tmpSTxt = $successTxt;
+
             //check that this input item is in the supplied array
             if (in_array($k, $check)) {
                 //lets identify what this input type is
@@ -74,6 +74,7 @@ class InputValidation
                 if ($type != false) {
                     switch ($type) {
                         case 'uk_telephone':
+                        case 'uk_mobile':
                             $v = str_replace(array('(', ')', ' '), '', $v);
                             $r = self::checkRegex($type, $v);
                             break;
@@ -88,12 +89,22 @@ class InputValidation
 
                     //woohoo, we passed validation
                     if ($r == true) {
-                        $results['msg'][] = "[{$k}|{$v}] identified as [{$type}] IS VALID";
+                        $results['success'][] = [
+                            'name' => $k,
+                            'value' => $v,
+                            'type' => $type,
+                            'message' => str_replace(array('[NAME]', '[TYPE]', '[VALUE]'), array($k, $type, $v), $tmpSTxt)
+                        ];
                     }
 
                     //oh no! we failed validation
                     if ($r == false) {
-                        $results['error'][] = str_replace(array('[NAME]', '[TYPE]','[VALUE]'), array($k,$type,$v), $tmpETxt);
+                        $results['error'][] = [
+                            'name' => $k,
+                            'value' => $v,
+                            'type' => $type,
+                            'message' => str_replace(array('[NAME]', '[TYPE]', '[VALUE]'), array($k, $type, $v), $tmpETxt)
+                        ];
                     }
                 }
             }
@@ -163,7 +174,7 @@ class InputValidation
         return $defs;
     }
 
-    public static function getErrorText($type ='error')
+    public static function getErrorText($type = 'error')
     {
         if ($eTxt = file(dirname(__DIR__) . "/src/config/{$type}.txt")) {
             foreach ($eTxt AS $err) {
