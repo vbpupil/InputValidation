@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/3.7/phpunit.xsd"
         backupGlobals="true"
         backupStaticAttributes="false"
-        bootstrap="./vendor/autoload.php"
+        bootstrap="vendor/autoload.php"
         cacheTokens="false"
         colors="false"
         convertErrorsToExceptions="true"
@@ -24,7 +24,7 @@
 
     <testsuites>
         <testsuite name="vbpupil/input-validation">
-            <directory>./test/</directory>
+            <directory suffix=".php">test/</directory>
         </testsuite>
     </testsuites>
     <!--
@@ -33,10 +33,10 @@
      !-->
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory>./src</directory>
+            <directory>src/</directory>
             <exclude>
-                <directory>./test</directory>
-                <directory>./vendor</directory>
+                <directory>test/</directory>
+                <directory>vendor/</directory>
                 <!-- don't cover interfaces -->
             </exclude>
         </whitelist>

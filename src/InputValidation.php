@@ -61,28 +61,36 @@ class InputValidation
             //check that this input item is in the supplied array
             if (in_array($k, $check)) {
                 //lets identify what this input type is
-                switch ($type = self::identify($k)) {
-                    case 'uk_telephone':
-                        $v = str_replace(array('(', ')', ' '), '', $v);
-                        $r = self::checkRegex(self::identify($k), $v);
-                        break;
-                    case 'postcode':
-                        $v = preg_replace('/\s+/','',$v);
-                        $r = self::checkRegex(self::identify($k), $v);
-                        break;
-                    default:
-                        $r = self::checkRegex(self::identify($k), $v);
-                        break;
+                $type = self::identify($k);
+
+                if ($type == false) {
+                    $results['error'][] = "[{$k}|{$v}] unable to identify type";
                 }
 
-                //woohoo, we passed validation
-                if ($r == true) {
-                    $results['msg'][] = "[{$k}|{$v}] identified as [{$type}] IS VALID";
-                }
+                if ($type != false) {
+                    switch ($type) {
+                        case 'uk_telephone':
+                            $v = str_replace(array('(', ')', ' '), '', $v);
+                            $r = self::checkRegex($type, $v);
+                            break;
+                        case 'postcode':
+                            $v = preg_replace('/\s+/', '', $v);
+                            $r = self::checkRegex($type, $v);
+                            break;
+                        default:
+                            $r = self::checkRegex($type, $v);
+                            break;
+                    }
 
-                //oh no! we failed validation
-                if ($r == false) {
-                    $results['error'][] = "[{$k}|{$v}] identified as [{$type}] IS INVALID";
+                    //woohoo, we passed validation
+                    if ($r == true) {
+                        $results['msg'][] = "[{$k}|{$v}] identified as [{$type}] IS VALID";
+                    }
+
+                    //oh no! we failed validation
+                    if ($r == false) {
+                        $results['error'][] = "[{$k}|{$v}] identified as [{$type}] IS INVALID";
+                    }
                 }
             }
         }
@@ -119,6 +127,6 @@ class InputValidation
             }
         }
 
-        return 'anything';
+        return false;
     }
 }

@@ -63,6 +63,6 @@ class TestValidation extends PHPUnit_Framework_TestCase
     public function testIdentify()
     {
         $this->assertEquals('uk_telephone', \vbpupil\InputValidation::identify('tel'));
-        $this->assertEquals('anything', \vbpupil\InputValidation::identify('oh-no'));
+        $this->assertEquals(false, \vbpupil\InputValidation::identify('oh-no'));
     }
 }
