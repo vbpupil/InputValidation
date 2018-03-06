@@ -1,7 +1,7 @@
 {
   "name": "vbpupil/input-validation",
   "description": "Very simple Form Input Validation for when you want to use your own existing forms.",
-  "license": "GPL 3.0",
+  "license": "GPL-3.0-or-later",
   "keywords": [
     "form",
     "input",
@@ -15,9 +15,9 @@
       "email": "vbpupil@gmail.com"
     }
   ],
-  "autoload" : {
-    "psr-4" : {
-      "vbpupil\\" : "src"
+  "autoload": {
+    "psr-4": {
+      "vbpupil\\": "src"
     }
   },
   "require": {
