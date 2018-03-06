@@ -139,7 +139,7 @@ class InputValidation
         foreach (self::getDefinitions() as $k => $v) {
             foreach ($v as $type) {
                 if (strpos($type, $data) !== false) {
-                    return $k;
+                    return str_replace("\r", '',$k);
                 }
             }
         }
