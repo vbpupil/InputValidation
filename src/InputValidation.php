@@ -155,7 +155,7 @@ class InputValidation
     {
         $defs = [];
 
-        foreach (file(dirname(__DIR__) . '/src/config/definitions.txt') as $def) {
+        foreach (file(dirname(__DIR__) . '/src/config/definitions.example') as $def) {
             if (!empty($def)) {
                 $tmp = explode('|', str_replace("\n", '', $def));
                 if (count($tmp) > 2) {
