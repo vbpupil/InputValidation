@@ -62,6 +62,14 @@ class InputValidation
             $tmpETxt = $errorTxt;
             $tmpSTxt = $successTxt;
 
+            if(self::notRequiredCheck($k)){
+                if(!empty($v)){
+                    $k = str_replace('*', '', $k);
+                }else{
+                    continue;
+                }
+            }
+
             //check that this input item is in the supplied array
             if (in_array($k, $check)) {
                 //lets identify what this input type is
@@ -112,6 +120,19 @@ class InputValidation
 
 
         return $results;
+    }
+
+    /**
+     * if the name contains an * then if the value is empty don't complain
+     * that were not valid
+     *
+     * @param $name
+     * @return bool
+     */
+    public static function notRequiredCheck($name)
+    {
+        $r =  (preg_match('~\*$~', $name) ? true : false);
+return $r;
     }
 
     /**

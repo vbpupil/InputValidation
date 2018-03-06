@@ -20,13 +20,16 @@ B. Once installed you will need to rename the contents of **src** directory, ie
 ## Usage
 
 Create your form as normal.
+
+note that **textarea** has a \* at the end of the name, this means that it is not a required field so 
+will only be validated if text is present.
 ```html
 <form method="POST">
      <input type="text" name="name" value="john" placeholder="NAME"><br>
      <input type="text" name="telephone" value="+44204444555" placeholder="TELEPHONE"><br>
      <input type="text" name="postcode" value="CT16 1AA" placeholder="POSTCODE"><br>
      <input type="text" name="mobile" value="07908765432'" placeholder="MOBILE"><br>
-     <textarea name="textarea">this is some test text'</textarea>
+     <textarea name="textarea*">this is some test text'</textarea>
      <input type="submit" name="submit">
  </form>
  ```
@@ -40,6 +43,7 @@ Create your form as normal.
 ```
 
 Set which inputs you want to check;
+
   ```php
  //indicates what inputs it should be checking
  $check = array('telephone','postcode','mobile','textarea');
