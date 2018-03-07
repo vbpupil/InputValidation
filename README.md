@@ -9,12 +9,24 @@ simply and quickly.
 A. In your terminal enter ***composer require vbpupil/input-validation***
 
 
-B. Once installed you will need to rename the contents of **src** directory, ie
->**definitions.example** change to **definitions.text**
+B. Once installed you will need to take a copy of the *config* directory and place it to be outside of the *vendor dir*, ie
 
->**error.example** change to **error.text**
+```
+project
+│
+└───config
+│   │
+│   └───InputValidation
+│               definitions.txt
+│               error.txt
+│               success.txt
+│   
+└───vendor
+    │
+    └───vbpupil
+```
 
->**success.example** change to **success.text**
+>This directory contains files that allow you to manage your definitions aswell as err and success return text. 
 
 
 ## Usage

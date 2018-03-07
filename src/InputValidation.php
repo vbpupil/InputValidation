@@ -132,7 +132,7 @@ class InputValidation
     public static function notRequiredCheck($name)
     {
         $r =  (preg_match('~\*$~', $name) ? true : false);
-return $r;
+        return $r;
     }
 
     /**
@@ -176,7 +176,7 @@ return $r;
     {
         $defs = [];
 
-        foreach (file(dirname(__DIR__) . '/src/config/definitions.txt') as $def) {
+        foreach (file(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/definitions.txt') as $def) {
             if (!empty($def)) {
                 $tmp = explode('|', str_replace("\n", '', $def));
                 if (count($tmp) > 2) {
@@ -197,7 +197,7 @@ return $r;
 
     public static function getErrorText($type = 'error')
     {
-        if ($eTxt = file(dirname(__DIR__) . "/src/config/{$type}.txt")) {
+        if ($eTxt = file(dirname(dirname(dirname(dirname(__DIR__)))) . "/config/InputValidation/{$type}.txt")) {
             foreach ($eTxt AS $err) {
                 if (!preg_match('~(^#|^\s)~', $err)) {
                     return $err;
