@@ -62,6 +62,26 @@ class InputValidation
             $tmpETxt = $errorTxt;
             $tmpSTxt = $successTxt;
 
+            /*LETS VALIDATE CSRF TOKEN*/
+            if($k == 'validation_token'){
+                try {
+                    if(self::compareToken($v) == true){
+                        $csrfChecked = true;
+                        continue;
+                    }else{
+                        $results['error'][] = [
+                            'name' => 'CSRF',
+                            'value' => '',
+                            'type' => '',
+                            'message' => 'CSRF VALIDATION FAILED.'
+                        ];
+                    }
+                }catch(\Exception $e){
+                    throw new \Exception($e->getMessage());
+                }
+            }
+            /*LETS VALIDATE CSRF TOKEN*/
+
             if(self::notRequiredCheck($k)){
                 if(!empty($v)){
                     $k = str_replace('*', '', $k);
@@ -206,5 +226,41 @@ class InputValidation
         }
 
         throw new \Exception("{$type} config file not present");
+    }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public static function createToken()
+    {
+        $hash = self::generateToken(session_id());
+        return "<input type='hidden' name='validation_token' value='{$hash}'>";
+    }
+
+    /**
+     * @param $input
+     * @return string
+     * @throws \Exception
+     */
+    public static function generateToken($input)
+    {
+        if(!is_string($input)){
+            throw new \Exception('Invalid id passed');
+        }
+
+        return hash('ripemd160', $input);
+    }
+
+    /**
+     * @param $input
+     * @return bool
+     * @throws \Exception
+     */
+    public function compareToken($input)
+    {
+        if( (self::generateToken(session_id())) == $input){
+            return true;
+        }
     }
 }
