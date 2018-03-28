@@ -9,12 +9,15 @@
 
 namespace vbpupil;
 
+use \Zend\Config\Reader\Yaml;
 
 /**
  * Class InputValidation
  */
 class InputValidation
 {
+    public static $config;
+
     /**
      * @var array
      */
@@ -35,8 +38,15 @@ class InputValidation
      */
     public static function validate($data, $check)
     {
-        //contains results to be returned back to the client
+        try {
+            self::getConfig();
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+        //1. contains results to be returned back to the client
         $results = [];
+        $csrfChecked = false;
 
         if (empty($check)) {
             //we don't have any check inputs set, error and leave.
@@ -44,48 +54,37 @@ class InputValidation
             return $results;
         }
 
-        //READ IN ERRO AND SUCCESS TEXT START
+        //2. perform a token check before anything else
         try {
-            $errorTxt = self::getErrorText();
-        } catch (\Exception $e) {
-            die(get_class() . ': ' . $e->getMessage());
-        }
-
-        try {
-            $successTxt = self::getErrorText('success');
-        } catch (\Exception $e) {
-            die(get_class() . ': ' . $e->getMessage());
-        }
-        //READ IN ERRO AND SUCCESS TEXT END
-
-        foreach ($data as $k => $v) {
-            $tmpETxt = $errorTxt;
-            $tmpSTxt = $successTxt;
-
-            /*LETS VALIDATE CSRF TOKEN*/
-            if($k == 'validation_token'){
-                try {
-                    if(self::compareToken($v) == true){
-                        $csrfChecked = true;
-                        continue;
-                    }else{
-                        $results['error'][] = [
-                            'name' => 'CSRF',
-                            'value' => '',
-                            'type' => '',
-                            'message' => 'CSRF VALIDATION FAILED.'
-                        ];
-                    }
-                }catch(\Exception $e){
-                    throw new \Exception($e->getMessage());
+            if (self::$config['config']['csrf_check'] == true){
+                if (self::compareToken($data['validation_token'], $data['form_id']) == true) {
+                    $csrfChecked = true;
+                } else {
+                    $results['error'][] = [
+                        'name' => 'CSRF',
+                        'value' => '',
+                        'type' => '',
+                        'message' => 'CSRF VALIDATION FAILED.'
+                    ];
                 }
             }
-            /*LETS VALIDATE CSRF TOKEN*/
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
 
-            if(self::notRequiredCheck($k)){
-                if(!empty($v)){
+
+        foreach ($data as $k => $v) {
+            $tmpETxt = self::$config['config']['error_text'];
+            $tmpSTxt = self::$config['config']['success_text'];
+
+            if ($k == 'validation_token' || $k == 'form_id') {
+                continue;
+            }
+
+            if (self::notRequiredCheck($k)) {
+                if (!empty($v)) {
                     $k = str_replace('*', '', $k);
-                }else{
+                } else {
                     continue;
                 }
             }
@@ -138,7 +137,6 @@ class InputValidation
             }
         }
 
-
         return $results;
     }
 
@@ -151,7 +149,7 @@ class InputValidation
      */
     public static function notRequiredCheck($name)
     {
-        $r =  (preg_match('~\*$~', $name) ? true : false);
+        $r = (preg_match('~\*$~', $name) ? true : false);
         return $r;
     }
 
@@ -180,7 +178,7 @@ class InputValidation
         foreach (self::getDefinitions() as $k => $v) {
             foreach ($v as $type) {
                 if (strpos($type, $data) !== false) {
-                    return str_replace("\r", '',$k);
+                    return str_replace("\r", '', $k);
                 }
             }
         }
@@ -215,41 +213,45 @@ class InputValidation
         return $defs;
     }
 
-    public static function getErrorText($type = 'error')
+    /**
+     * @throws \Exception
+     */
+    public static function getConfig()
     {
-        if ($eTxt = file(dirname(dirname(dirname(dirname(__DIR__)))) . "/config/InputValidation/{$type}.txt")) {
-            foreach ($eTxt AS $err) {
-                if (!preg_match('~(^#|^\s)~', $err)) {
-                    return $err;
-                }
+        $reader = new \Zend\Config\Reader\Yaml(['Spyc', 'YAMLLoadString']);
+        self::$config = $reader->fromFile(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml');
+
+        foreach (array('error_text', 'success_text', 'csrf_check') as $check) {
+            if (empty(self::$config['config']['error_text'])) {
+                throw new \Exception("{$check} in config is not set.");
             }
         }
-
-        throw new \Exception("{$type} config file not present");
     }
 
     /**
      * @return string
      * @throws \Exception
      */
-    public static function createToken()
+    public static function createToken($formID)
     {
-        $hash = self::generateToken(session_id());
-        return "<input type='hidden' name='validation_token' value='{$hash}'>";
-    }
-
-    /**
-     * @param $input
-     * @return string
-     * @throws \Exception
-     */
-    public static function generateToken($input)
-    {
-        if(!is_string($input)){
-            throw new \Exception('Invalid id passed');
+        if (isset($formID) && $formID !== '' && is_string($formID)) {
+            $token = self::generateToken($formID);
+            return "<input type='text' name='validation_token' value='{$token}'><input type='text' name='form_id' value='{$formID}'>";
         }
 
-        return hash('ripemd160', $input);
+        throw new \Exception('Form Name is not valid');
+    }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    private function generateToken($formID)
+    {
+        $token = bin2hex(random_bytes(16));
+        $_SESSION['input_validation'] = array(hash('ripemd160', $formID) => $token);
+
+        return $token;
     }
 
     /**
@@ -257,9 +259,12 @@ class InputValidation
      * @return bool
      * @throws \Exception
      */
-    public function compareToken($input)
+    private function compareToken($token, $formID)
     {
-        if( (self::generateToken(session_id())) == $input){
+        if (
+            array_key_exists(hash('ripemd160', $formID), $_SESSION['input_validation']) &&
+            $_SESSION['input_validation'][hash('ripemd160', $formID)] == $token
+        ) {
             return true;
         }
     }
