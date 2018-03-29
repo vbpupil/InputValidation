@@ -42,7 +42,7 @@ class TestValidation extends PHPUnit_Framework_TestCase
             'name' => 'mike',
             'telephone' => '01604444555',
             'postcode' => 'nn12pw'
-        ), array('telephone'));
+        ), array('telephone'), true);
 
         $this->assertEquals($r['msg'][0], "[telephone|01604444555] identified as [uk_telephone] IS VALID");
 
