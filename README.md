@@ -17,16 +17,14 @@ project
 └───config
 │   │
 │   └───InputValidation
-│               definitions.txt
-│               error.txt
-│               success.txt
+│               config.yml
 │   
 └───vendor
     │
     └───vbpupil
 ```
 
->This directory contains files that allow you to manage your definitions aswell as err and success return text. 
+>This directory contains a yaml file that allow you to manage your definitions aswell as err and success return text. 
 
 
 ## Usage

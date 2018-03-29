@@ -16,7 +16,15 @@ use \Zend\Config\Reader\Yaml;
  */
 class InputValidation
 {
+    /**
+     * @var
+     */
     public static $config;
+
+    /**
+     * @var bool
+     */
+    public static $testing = false;
 
     /**
      * @var array
@@ -36,8 +44,10 @@ class InputValidation
      * @return array
      * @throws \Exception
      */
-    public static function validate($data, $check)
+    public static function validate($data, $check, $testing = false)
     {
+        self::$testing = $testing;
+
         try {
             self::getConfig();
         } catch (\Exception $e) {
@@ -194,7 +204,7 @@ class InputValidation
     {
         $defs = [];
 
-        foreach (file(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/definitions.txt') as $def) {
+        foreach (file(self::$config['definitions'] ) as $def) {
             if (!empty($def)) {
                 $tmp = explode('|', str_replace("\n", '', $def));
                 if (count($tmp) > 2) {
@@ -219,7 +229,14 @@ class InputValidation
     public static function getConfig()
     {
         $reader = new \Zend\Config\Reader\Yaml(['Spyc', 'YAMLLoadString']);
-        self::$config = $reader->fromFile(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml');
+
+        if(file_exists(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml')){
+            self::$config = $reader->fromFile(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml');
+        }elseif(file_exists(__DIR__ . '/config/InputValidation/config.yml')){
+            self::$config = $reader->fromFile(__DIR__ . '/config/InputValidation/config.yml');
+        }else{
+            throw new \Exception('Missing config file, cannot continue.');
+        }
 
         foreach (array('error_text', 'success_text', 'csrf_check') as $check) {
             if (empty(self::$config['config']['error_text'])) {
