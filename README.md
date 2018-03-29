@@ -3,7 +3,7 @@ Simple form input validation. To be used when you need a quick on the fly no non
 
 This simple class is not meant to replace some of he more advanced validation scripts, its simply a substitute for
 when you have pre existing forms that are not part of any form solution and just need to validate
-simply and quickly.
+simply and quickly. Validation now includes CSRF which is handled via $_SESSION.
 
 ## Install
 A. In your terminal enter ***composer require vbpupil/input-validation***
@@ -31,10 +31,16 @@ project
 
 Create your form as normal.
 
-note that **textarea** has a \* at the end of the name, this means that it is not a required field so 
+1. note that **textarea** has a \* at the end of the name, this means that it is not a required field so 
 will only be validated if text is present.
+
+2. also note that if you require CSRF support then simply add in the call below. The argument sent in **form-1** is the
+unique id for the form. Also worth noting that session start is required before the call to ensure that the SESSION values persist.
 ```html
+<?php session_start(); ?>
+
 <form method="POST">
+     <?= InputValidation::createToken('form-1') ?>
      <input type="text" name="name" value="john" placeholder="NAME"><br>
      <input type="text" name="telephone" value="+44204444555" placeholder="TELEPHONE"><br>
      <input type="text" name="postcode" value="CT16 1AA" placeholder="POSTCODE"><br>
@@ -44,15 +50,14 @@ will only be validated if text is present.
  </form>
  ```
  
- include the package.
+ 3. include the package.
  ```php
  use vbpupil\InputValidation;
  
  include 'vendor/autoload.php';
- 
 ```
 
-Set which inputs you want to check;
+4. set which inputs you want to check;
 
   ```php
  //indicates what inputs it should be checking
@@ -60,7 +65,7 @@ Set which inputs you want to check;
 
  ```
  
- Implement check upon post.
+ 5. implement check upon post.
 ```php
   if(isset($_POST)) {
       $r = InputValidation::validate($_POST, $check);

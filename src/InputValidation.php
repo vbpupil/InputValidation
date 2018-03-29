@@ -9,6 +9,7 @@
 
 namespace vbpupil;
 
+use Exception;
 use \Zend\Config\Reader\Yaml;
 
 /**
@@ -42,7 +43,7 @@ class InputValidation
      * @param $data
      * @param $check
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public static function validate($data, $check, $testing = false)
     {
@@ -50,8 +51,8 @@ class InputValidation
 
         try {
             self::getConfig();
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
         }
 
         //1. contains results to be returned back to the client
@@ -66,7 +67,7 @@ class InputValidation
 
         //2. perform a token check before anything else
         try {
-            if (self::$config['config']['csrf_check'] == true){
+            if (isset(self::$config['config']['csrf_check']) && self::$config['config']['csrf_check'] == true){
                 if (self::compareToken($data['validation_token'], $data['form_id']) == true) {
                     $csrfChecked = true;
                 } else {
@@ -77,9 +78,11 @@ class InputValidation
                         'message' => 'CSRF VALIDATION FAILED.'
                     ];
                 }
+            }else{
+                throw new Exception('CSRF setting is not set.');
             }
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
         }
 
 
@@ -181,7 +184,7 @@ class InputValidation
      *
      * @param $data
      * @return int|string
-     * @throws \Exception
+     * @throws Exception
      */
     public static function identify($data)
     {
@@ -198,7 +201,7 @@ class InputValidation
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public static function getDefinitions()
     {
@@ -208,11 +211,11 @@ class InputValidation
             if (!empty($def)) {
                 $tmp = explode('|', str_replace("\n", '', $def));
                 if (count($tmp) > 2) {
-                    throw new \Exception('Invalid definitions file');
+                    throw new Exception('Invalid definitions file');
                 }
 
                 if ($tmp[0] == '' || $tmp[1] == '') {
-                    throw new \Exception('Invalid definitions file');
+                    throw new Exception('Invalid definitions file');
 
                 }
 
@@ -224,7 +227,7 @@ class InputValidation
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public static function getConfig()
     {
@@ -235,19 +238,19 @@ class InputValidation
         }elseif(file_exists(__DIR__ . '/config/InputValidation/config.yml')){
             self::$config = $reader->fromFile(__DIR__ . '/config/InputValidation/config.yml');
         }else{
-            throw new \Exception('Missing config file, cannot continue.');
+            throw new Exception('Missing config file, cannot continue.');
         }
 
         foreach (array('error_text', 'success_text', 'csrf_check') as $check) {
             if (empty(self::$config['config']['error_text'])) {
-                throw new \Exception("{$check} in config is not set.");
+                throw new Exception("{$check} in config is not set.");
             }
         }
     }
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public static function createToken($formID)
     {
@@ -256,12 +259,12 @@ class InputValidation
             return "<input type='text' name='validation_token' value='{$token}'><input type='text' name='form_id' value='{$formID}'>";
         }
 
-        throw new \Exception('Form Name is not valid');
+        throw new Exception('Form Name is not valid');
     }
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     private function generateToken($formID)
     {
@@ -274,7 +277,7 @@ class InputValidation
     /**
      * @param $input
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     private function compareToken($token, $formID)
     {
