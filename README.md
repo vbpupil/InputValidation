@@ -36,6 +36,7 @@ will only be validated if text is present.
 
 2. also note that if you require CSRF support then simply add in the call below. The argument sent in **form-1** is the
 unique id for the form. Also worth noting that session start is required before the call to ensure that the SESSION values persist.
+
 ```html
 <?php session_start(); ?>
 
@@ -50,7 +51,9 @@ unique id for the form. Also worth noting that session start is required before 
  </form>
  ```
  
- 3. include the package.
+3. include the package.
+
+
  ```php
  use vbpupil\InputValidation;
  
@@ -64,8 +67,9 @@ unique id for the form. Also worth noting that session start is required before 
  $check = array('telephone','postcode','mobile','textarea');
 
  ```
- 
- 5. implement check upon post.
+
+5. implement check upon post.
+
 ```php
   if(isset($_POST)) {
       $r = InputValidation::validate($_POST, $check);

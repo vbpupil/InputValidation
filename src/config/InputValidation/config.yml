@@ -1,18 +1,18 @@
 config:
   csrf_check: false
-  error_text: [NAME] is NOT valid
-  success_text: [NAME] is a valid [TYPE]
+  error_text: '[NAME] is NOT valid'
+  success_text: '[NAME] is a valid [TYPE]'
 definitions:
-  email:  email
-  contact_email:  email
-  sales_email:  email
-  phone:  uk_telephone
-  tel:  uk_telephone
-  telephone:  uk_telephone
-  mobile: uk_mobile
-  mob:  uk_mobile
-  postcode: postcode
-  postcode: postcode
-  post-code:  postcode
-  post_code:  postcode
-  textarea: text
+  email:  'email'
+  contact_email:  'email'
+  sales_email:  'email'
+  phone:  'uk_telephone'
+  tel:  'uk_telephone'
+  telephone:  'uk_telephone'
+  mobile: 'uk_mobile'
+  mob:  'uk_mobile'
+  postcode: 'postcode'
+  postcode: 'postcode'
+  post-code:  'postcode'
+  post_code:  'postcode'
+  textarea: 'text'
