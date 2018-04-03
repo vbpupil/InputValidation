@@ -23,11 +23,6 @@ class InputValidation
     public static $config;
 
     /**
-     * @var bool
-     */
-    public static $testing = false;
-
-    /**
      * @var array
      */
     public static $regex = [
@@ -45,10 +40,8 @@ class InputValidation
      * @return array
      * @throws Exception
      */
-    public static function validate($data, $check, $testing = false)
+    public static function validate($data, $check)
     {
-        self::$testing = $testing;
-
         try {
             self::getConfig();
         } catch (Exception $e) {
@@ -201,25 +194,14 @@ class InputValidation
 
     /**
      * @return array
-     * @throws Exception
      */
     public static function getDefinitions()
     {
         $defs = [];
 
-        foreach (file(self::$config['definitions'] ) as $def) {
-            if (!empty($def)) {
-                $tmp = explode('|', str_replace("\n", '', $def));
-                if (count($tmp) > 2) {
-                    throw new Exception('Invalid definitions file');
-                }
-
-                if ($tmp[0] == '' || $tmp[1] == '') {
-                    throw new Exception('Invalid definitions file');
-
-                }
-
-                $defs[$tmp[1]][] = $tmp[0];
+        foreach (self::$config['definitions']  as $k => $v) {
+            if (!empty($v)) {
+                $defs[$v][] = $k;
             }
         }
 
@@ -256,7 +238,7 @@ class InputValidation
     {
         if (isset($formID) && $formID !== '' && is_string($formID)) {
             $token = self::generateToken($formID);
-            return "<input type='text' name='validation_token' value='{$token}'><input type='text' name='form_id' value='{$formID}'>";
+            return "<input type='hidden' name='validation_token' value='{$token}'><input type='hidden' name='form_id' value='{$formID}'>";
         }
 
         throw new Exception('Form Name is not valid');
