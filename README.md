@@ -53,6 +53,7 @@ unique id for the form. Also worth noting that session start is required before 
  
 3. include the package.
 
+
  ```php
  use vbpupil\InputValidation;
  
@@ -66,7 +67,7 @@ unique id for the form. Also worth noting that session start is required before 
  $check = array('telephone','postcode','mobile','textarea');
 
  ```
- 
+
 5. implement check upon post.
 
 ```php

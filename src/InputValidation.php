@@ -60,7 +60,7 @@ class InputValidation
 
         //2. perform a token check before anything else
         try {
-            if (isset(self::$config['config']['csrf_check']) && self::$config['config']['csrf_check'] == true){
+            if (isset(self::$config['config']['csrf_check']) && self::$config['config']['csrf_check'] == true) {
                 if (self::compareToken($data['validation_token'], $data['form_id']) == true) {
                     $csrfChecked = true;
                 } else {
@@ -71,7 +71,7 @@ class InputValidation
                         'message' => 'CSRF VALIDATION FAILED.'
                     ];
                 }
-            }else{
+            } else {
                 throw new Exception('CSRF setting is not set.');
             }
         } catch (Exception $e) {
@@ -198,13 +198,11 @@ class InputValidation
     public static function getDefinitions()
     {
         $defs = [];
-
-        foreach (self::$config['definitions']  as $k => $v) {
+        foreach (self::$config['definitions'] as $k => $v) {
             if (!empty($v)) {
                 $defs[$v][] = $k;
             }
         }
-
         return $defs;
     }
 
@@ -215,11 +213,11 @@ class InputValidation
     {
         $reader = new \Zend\Config\Reader\Yaml(['Spyc', 'YAMLLoadString']);
 
-        if(file_exists(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml')){
+        if (file_exists(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml')) {
             self::$config = $reader->fromFile(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml');
-        }elseif(file_exists(__DIR__ . '/config/InputValidation/config.yml')){
+        } elseif (file_exists(__DIR__ . '/config/InputValidation/config.yml')) {
             self::$config = $reader->fromFile(__DIR__ . '/config/InputValidation/config.yml');
-        }else{
+        } else {
             throw new Exception('Missing config file, cannot continue.');
         }
 
