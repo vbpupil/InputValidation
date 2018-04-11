@@ -1,5 +1,5 @@
 config:
-  csrf_check: false
+  csrf_check: true
   error_text: '[NAME] is NOT valid'
   success_text: '[NAME] is a valid [TYPE]'
 definitions:
@@ -12,7 +12,5 @@ definitions:
   mobile: 'uk_mobile'
   mob:  'uk_mobile'
   postcode: 'postcode'
-  postcode: 'postcode'
-  post-code:  'postcode'
   post_code:  'postcode'
   textarea: 'text'

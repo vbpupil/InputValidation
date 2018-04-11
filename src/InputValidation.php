@@ -68,11 +68,9 @@ class InputValidation
                         'name' => 'CSRF',
                         'value' => '',
                         'type' => '',
-                        'message' => 'CSRF VALIDATION FAILED.'
+                        'message' => 'CSRF VALIDATION FAILED, ARE SESSIONS ENABLED?.'
                     ];
                 }
-            } else {
-                throw new Exception('CSRF setting is not set.');
             }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
