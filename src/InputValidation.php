@@ -10,7 +10,7 @@
 namespace vbpupil;
 
 use Exception;
-use \Zend\Config\Reader\Yaml;
+use \Symfony\Component\Yaml\Yaml;
 
 /**
  * Class InputValidation
@@ -208,12 +208,10 @@ class InputValidation
      */
     public static function getConfig()
     {
-        $reader = new \Zend\Config\Reader\Yaml(['Spyc', 'YAMLLoadString']);
-
         if (file_exists(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml')) {
-            self::$config = $reader->fromFile(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml');
+            self::$config = Yaml::parseFile(dirname(dirname(dirname(dirname(__DIR__)))) . '/config/InputValidation/config.yml');
         } elseif (file_exists(__DIR__ . '/config/InputValidation/config.yml')) {
-            self::$config = $reader->fromFile(__DIR__ . '/config/InputValidation/config.yml');
+            self::$config = Yaml::parseFile(__DIR__ . '/config/InputValidation/config.yml');
         } else {
             throw new Exception('Missing config file, cannot continue.');
         }
@@ -243,7 +241,7 @@ class InputValidation
      * @return string
      * @throws Exception
      */
-    private function generateToken($formID)
+    private static function generateToken($formID)
     {
         $token = bin2hex(random_bytes(16));
         $_SESSION['input_validation'] = array(hash('ripemd160', $formID) => $token);
